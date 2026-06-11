@@ -3,34 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>श्री प्रगति गणेश युवक मंडल - महा रजिस्टर</title>
-    <!-- Tailwind CSS -->
+    <title>श्री प्रगति गणेश युवक मंडल - लाइव ऐप</title>
+    
+    <!-- PWA App Coding (मोबाइल ऐप सेटअप) -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"श्री प्रगति गणेश मंडल ऐप","short_name":"गणेश मंडल","start_url":"./","display":"standalone","background_color":"%23f3f4f6","theme_color":"%23ea580c","orientation":"portrait"}'>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800 antialiased">
 
-    <!-- Header Section -->
+    <!-- App Header -->
     <header class="bg-orange-600 text-white text-center py-5 shadow-md sticky top-0 z-10">
-        <h1 class="text-2xl md:text-3xl font-bold tracking-wide">🙏 श्री प्रगति गणेश युवक मंडल 🙏</h1>
-        <p class="text-orange-200 text-sm mt-1">महा डिजिटल बही (वर्ष 2999 एवं 10,000+ सदस्य क्षमता)</p>
+        <h1 class="text-2xl font-bold tracking-wide">🙏 श्री प्रगति गणेश युवक मंडल 🙏</h1>
+        <p class="text-orange-200 text-xs mt-1" id="sync-status">🔄 लाइव डेटा सिंक एक्टिव...</p>
     </header>
 
-    <div class="max-w-4xl mx-auto p-4">
+    <div class="max-w-4xl mx-auto p-4 pb-20">
         
-        <!-- Year Selector Input Dashboard -->
+        <!-- Year Selector -->
         <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-orange-500">
             <div class="w-full sm:w-auto">
-                <label class="text-xs font-bold text-gray-500 uppercase block mb-1">उत्सव का वर्ष लिखें (जैसे: 2026 या 2999)</label>
+                <label class="text-xs font-bold text-gray-500 uppercase block mb-1">उत्सव का वर्ष</label>
                 <div class="flex gap-2">
-                    <input type="number" id="year-input" value="2026" min="2025" max="2999" class="w-32 bg-orange-50 border border-orange-300 text-orange-700 font-bold py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg">
-                    <button onclick="changeYear()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer transition">बदलें</button>
+                    <input type="number" id="year-input" value="2026" min="2025" max="2999" class="w-32 bg-orange-50 border border-orange-300 text-orange-700 font-bold py-2 px-3 rounded-lg text-lg">
+                    <button onclick="changeYear()" class="bg-orange-600 text-white font-bold px-4 py-2 rounded-lg text-sm cursor-pointer">बदलें</button>
                 </div>
             </div>
             <div class="text-center sm:text-right">
-                <span class="text-sm font-semibold text-gray-500">वर्ष <span id="display-year">2026</span> का हिसाबी बजट</span>
-                <p class="text-2xl font-black text-orange-600">डिजिटल एक्टिव</p>
+                <span class="text-sm font-semibold text-gray-500">वर्ष <span id="display-year">2026</span> का बजट</span>
+                <p class="text-2xl font-black text-green-600">● ऑनलाइन लाइव</p>
             </div>
         </div>
 
@@ -45,7 +49,7 @@
                 <p class="text-lg font-bold text-green-600" id="paid-count">0</p>
             </div>
             <div class="bg-white p-3 rounded-xl shadow-sm border-b-4 border-blue-500 text-center">
-                <p class="text-[10px] text-gray-500 font-semibold uppercase">कुल चंदा जमा</p>
+                <p class="text-[10px] text-gray-500 font-semibold uppercase">कुल चंदा</p>
                 <p class="text-lg font-bold text-blue-600" id="total-collection">₹0</p>
             </div>
             <div class="bg-white p-3 rounded-xl shadow-sm border-b-4 border-red-500 text-center">
@@ -58,359 +62,224 @@
             </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
-            <div class="flex justify-between text-sm font-semibold mb-2">
-                <span>इस साल की कलेक्शन प्रोग्रेस</span>
-                <span id="progress-percent">0%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                <div id="progress-bar" class="bg-green-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-        </div>
-
         <!-- Search & Filters -->
         <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col md:flex-row gap-3 items-center justify-between">
             <div class="relative w-full md:w-72">
-                <input type="text" id="search-input" placeholder="सदस्य का नाम खोजें..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <input type="text" id="search-input" placeholder="सदस्य का नाम खोजें..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
             </div>
-            <div class="flex gap-2 w-full md:w-auto overflow-x-auto">
-                <button onclick="filterMembers('all')" id="btn-all" class="px-4 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white shadow-sm whitespace-nowrap">सभी</button>
-                <button onclick="filterMembers('paid')" id="btn-paid" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-green-100 whitespace-nowrap">जमा (Paid)</button>
-                <button onclick="filterMembers('pending')" id="btn-pending" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-yellow-100 whitespace-nowrap">बाकी (Pending)</button>
+            <div class="flex gap-2">
+                <button onclick="filterMembers('all')" id="btn-all" class="px-4 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white">सभी</button>
+                <button onclick="filterMembers('paid')" id="btn-paid" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">जमा</button>
+                <button onclick="filterMembers('pending')" id="btn-pending" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700">बाकी</button>
             </div>
         </div>
 
-        <!-- Members List Container -->
+        <!-- Members List -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between font-semibold text-sm text-gray-600">
-                <span>सदस्य सूची (ID और नाम)</span>
-                <span>स्टेटस / चंदा रकम</span>
-            </div>
-            <div id="members-list" class="divide-y divide-gray-100 max-h-[350px] overflow-y-auto">
-                <!-- लिस्ट यहाँ लोड होगी -->
-            </div>
+            <div id="members-list" class="divide-y divide-gray-100 max-h-[350px] overflow-y-auto"></div>
         </div>
 
-        <!-- Expense Tracker Section -->
+        <!-- Expense Section -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 border border-red-100">
             <div class="p-4 bg-red-50 border-b border-red-100 flex justify-between items-center">
-                <h3 class="font-bold text-red-800"><i class="fa-solid fa-wallet mr-1"></i> छोटे-mote खर्चों का हिसाब</h3>
-                <button onclick="addExpense()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-sm transition cursor-pointer">
+                <h3 class="font-bold text-red-800"><i class="fa-solid fa-wallet mr-1"></i> छोटे-मोटे खर्चों का हिसाब</h3>
+                <button onclick="addExpense()" class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold">
                     <i class="fa-solid fa-plus mr-1"></i> नया खर्च जोड़ें
                 </button>
             </div>
-            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between font-semibold text-xs text-gray-500">
-                <span>खर्च का विवरण (किस काम में खर्च हुआ)</span>
-                <span>रकम (रुपये)</span>
-            </div>
-            <div id="expenses-list" class="divide-y divide-gray-100 max-h-[180px] overflow-y-auto">
-                <!-- खर्चों की लिस्ट यहाँ लोड होगी -->
-            </div>
+            <div id="expenses-list" class="divide-y divide-gray-100 max-h-[180px] overflow-y-auto"></div>
         </div>
 
-        <!-- Admin Control Panel & Backup -->
+        <!-- Controls -->
         <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center space-y-4 mb-10">
-            <h3 class="text-sm font-bold text-amber-800"><i class="fa-solid fa-lock-open mr-1"></i> एडमिन स्पेशल कंट्रोल पैनल</h3>
+            <h3 class="text-sm font-bold text-amber-800">⚙️ एडमिन स्पेशल कंट्रोल पैनल</h3>
             <div class="flex flex-wrap gap-2 justify-center">
-                <button onclick="addNewMember()" class="bg-green-600 hover:bg-green-700 text-white text-xs px-4 py-2 rounded-lg font-medium shadow-sm transition cursor-pointer">
-                    <i class="fa-solid fa-user-plus mr-1"></i> नया सदस्य जोड़ें (+ Add Member)
-                </button>
-                <button onclick="editMemberName()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-4 py-2 rounded-lg font-medium shadow-sm transition cursor-pointer">
-                    <i class="fa-solid fa-user-pen mr-1"></i> सदस्य का नाम सुधारें
-                </button>
-                <button onclick="exportData()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-lg font-medium shadow-sm transition cursor-pointer">
-                    <i class="fa-solid fa-download mr-1"></i> हिसाब बैकअप डाउनलोड करें
-                </button>
-                <button onclick="document.getElementById('import-file').click()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded-lg font-medium shadow-sm transition cursor-pointer">
-                    <i class="fa-solid fa-upload mr-1"></i> हिसाब रिस्टोर अपलोड करें
-                </button>
-                <input type="file" id="import-file" onchange="importData(event)" class="hidden" accept=".json">
+                <button onclick="addNewMember()" class="bg-green-600 text-white text-xs px-4 py-2 rounded-lg">नया सदस्य जोड़ें</button>
+                <button onclick="editMemberName()" class="bg-amber-600 text-white text-xs px-4 py-2 rounded-lg">नाम सुधारें</button>
+                <button onclick="forceSync()" class="bg-blue-600 text-white text-xs px-4 py-2 rounded-lg"><i class="fa-solid fa-cloud-arrow-up"></i> तुरंत क्लाउड सिंक करें</button>
             </div>
-            <p class="text-[11px] text-amber-700 font-medium">📌 नोट: बदलाव करने के बाद "बैकअप डाउनलोड करें" बटन दबाकर फाइल सुरक्षित रखें!</p>
         </div>
-
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "9680"; 
+        // CONFIGURATION (ठीक की हुई ऑटोमैटिक सिंक सेटिंग्स)
+        const GITHUB_USER = "halpatinimeshj575-hue"; 
+        const GITHUB_REPO = "Ganptivankaner.com"; 
+        const GITHUB_TOKEN = "Github_pat_11CFXA7EI0kUsuKLZX73e5_GWAGv0BSxuWm9sx9N08rTSemH9p29AiBvhAzwOqsBeGABPV2TPJC1X4qLIC"; 
 
-        // मास्टर इन-मेमोरी डेटाबेस
+        const ADMIN_PASSWORD = "9680"; 
+        let fileSha = ""; 
+
         let mandalData = {
-            memberNames: {
-                "m1": "निमेष हलपति",
-                "m2": "राहुल भाई",
-                "m3": "रोहन पटेल",
-                "m4": "निर्मल कुमार",
-                "m5": "कार्तिक हलपति"
-            },
-            years: {}
+            memberNames: {"m1": "निमेष हलपति", "m2": "राहुल भाई", "m3": "रोहन पटेल", "m4": "निर्मल कुमार", "m5": "कार्तिक हलपति"},
+            years: {"2026": {collections: {}, expenses: []}}
         };
 
         let currentYear = "2026";
         let currentFilter = 'all';
         let searchQuery = '';
 
-        // शुरुआत में करंट ईयर का डेटा ढांचा तैयार करना
-        mandalData.years[currentYear] = { collections: {}, expenses: [] };
+        async function loadDataFromGitHub() {
+            document.getElementById('sync-status').innerText = "🔄 इंटरनेट से नया हिसाब लोड हो रहा है...";
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/mandal_db.json`;
+                const response = await fetch(url, {
+                    headers: { "Authorization": `token ${GITHUB_TOKEN}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.sha;
+                    const decodedData = JSON.parse(atob(data.content));
+                    mandalData = decodedData;
+                    document.getElementById('sync-status').innerText = "✅ लाइव हिसाब अपडेटेड है!";
+                } else {
+                    document.getElementById('sync-status').innerText = "⚠️ पहली बार चल रहा है, नया डेटाबेस तैयार है!";
+                    await saveDataToGitHub(); 
+                }
+            } catch (err) {
+                document.getElementById('sync-status').innerText = "❌ सिंक फेल! ऑफलाइन मोड चालू है।";
+            }
+            refreshAll();
+        }
 
-        // वर्ष बदलने का फंक्शन
+        async function saveDataToGitHub() {
+            document.getElementById('sync-status').innerText = "📤 क्लाउड पर हिसाब लाइव सेव हो रहा है...";
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/mandal_db.json`;
+                const body = {
+                    message: "App Auto Sync Update",
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(mandalData)))),
+                    sha: fileSha || undefined
+                };
+                const response = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${GITHUB_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                });
+                if(response.ok) {
+                    const resData = await response.json();
+                    fileSha = resData.content.sha;
+                    document.getElementById('sync-status').innerText = "✅ सब कुछ इंटरनेट पर लाइव सेव हो गया!";
+                } else {
+                    document.getElementById('sync-status').innerText = "❌ क्लाउड सेव फेल! टोकन चेक करें।";
+                }
+            } catch (err) {
+                document.getElementById('sync-status').innerText = "❌ नेटवर्क एरर! सेव नहीं हो पाया।";
+            }
+        }
+
         function changeYear() {
             const yrInput = document.getElementById('year-input').value;
             if(yrInput >= 2025 && yrInput <= 2999) {
                 currentYear = yrInput.toString();
                 document.getElementById('display-year').innerText = currentYear;
-                
-                if (!mandalData.years[currentYear]) {
-                    mandalData.years[currentYear] = { collections: {}, expenses: [] };
-                }
-                
+                if (!mandalData.years[currentYear]) mandalData.years[currentYear] = { collections: {}, expenses: [] };
                 refreshAll();
-            } else {
-                alert("कृपया वर्ष 2025 से 2999 के बीच लिखें!");
             }
         }
 
-        // मास्टर रिफ्रेश (जोड़-घटाव और लिस्ट अपडेट)
         function refreshAll() {
-            const yearData = mandalData.years[currentYear];
+            const yearData = mandalData.years[currentYear] || { collections: {}, expenses: [] };
             const totalMembers = Object.keys(mandalData.memberNames).length;
-            
-            let paidCount = 0;
-            let totalAmt = 0;
+            let paidCount = 0, totalAmt = 0;
 
-            // 1. चंदा जोड़ना
             Object.keys(mandalData.memberNames).forEach(id => {
                 const statusData = yearData.collections[id];
-                if (statusData && statusData.status === 'paid') {
-                    paidCount++;
-                    totalAmt += parseInt(statusData.amount || 0);
-                }
+                if (statusData && statusData.status === 'paid') { paidCount++; totalAmt += parseInt(statusData.amount || 0); }
             });
 
-            // 2. कुल खर्च जोड़ना
             let totalExp = 0;
-            if (yearData.expenses && Array.isArray(yearData.expenses)) {
-                yearData.expenses.forEach(e => {
-                    totalExp += parseInt(e.amount || 0);
-                });
-            }
-
-            // 3. हाथ में बचे पैसे (कैश)
+            if (yearData.expenses) yearData.expenses.forEach(e => totalExp += parseInt(e.amount || 0));
             let netBal = totalAmt - totalExp;
-            const percent = totalAmt > 0 ? Math.round((totalAmt / 100000) * 100) : 0;
 
-            // स्क्रीन पर डिब्बे अपडेट करना
             document.getElementById('total-members-count').innerText = totalMembers;
             document.getElementById('paid-count').innerText = paidCount;
-            document.getElementById('total-collection').innerText = `₹${totalAmt.toLocaleString('en-IN')}`;
-            document.getElementById('total-expenses').innerText = `₹${totalExp.toLocaleString('en-IN')}`;
-            document.getElementById('net-balance').innerText = `₹${netBal.toLocaleString('en-IN')}`;
-            document.getElementById('progress-percent').innerText = `${percent}%`;
-            document.getElementById('progress-bar').style.width = `${percent > 100 ? 100 : percent}%`;
+            document.getElementById('total-collection').innerText = `₹${totalAmt}`;
+            document.getElementById('total-expenses').innerText = `₹${totalExp}`;
+            document.getElementById('net-balance').innerText = `₹${netBal}`;
 
-            // चंदा लिस्ट दोबारा बनाना
             const listContainer = document.getElementById('members-list');
             listContainer.innerHTML = '';
-            let filteredCount = 0;
-
-            const sortedIds = Object.keys(mandalData.memberNames).sort((a, b) => parseInt(a.replace('m', '')) - parseInt(b.replace('m', '')));
-
-            sortedIds.forEach(id => {
+            Object.keys(mandalData.memberNames).forEach(id => {
                 const name = mandalData.memberNames[id];
                 const statusData = yearData.collections[id] || { status: 'pending', amount: 0 };
-
-                const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
-                const matchesFilter = currentFilter === 'all' || statusData.status === currentFilter;
-
-                if (matchesSearch && matchesFilter) {
-                    filteredCount++;
+                if (name.toLowerCase().includes(searchQuery.toLowerCase()) && (currentFilter === 'all' || statusData.status === currentFilter)) {
                     const item = document.createElement('div');
-                    item.className = "p-3 flex justify-between items-center hover:bg-gray-50 transition text-sm";
-                    
-                    let statusBadge = '';
-                    if (statusData.status === 'paid') {
-                        statusBadge = `<span class="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-full font-bold"><i class="fa-solid fa-circle-check mr-1"></i> ₹${statusData.amount} जमा</span>`;
-                    } else {
-                        statusBadge = `<button onclick="markAsPaid('${id}')" class="bg-yellow-100 hover:bg-orange-500 hover:text-white text-yellow-700 text-xs px-3 py-1 rounded-full font-bold transition cursor-pointer">पेंडिंग</button>`;
-                    }
-
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <div class="w-10 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-[9px]">
-                                ${id.toUpperCase()}
-                            </div>
-                            <span class="font-medium text-gray-700">${name}</span>
-                        </div>
-                        <div>${statusBadge}</div>
-                    `;
+                    item.className = "p-3 flex justify-between items-center text-sm border-b border-gray-100 hover:bg-gray-50";
+                    let badge = statusData.status === 'paid' ? `<span class='text-green-600 font-bold'>₹${statusData.amount} जमा</span>` : `<button onclick="markAsPaid('${id}')" class='bg-yellow-100 text-yellow-700 font-bold px-3 py-1 rounded-full text-xs'>पेंडिंग</button>`;
+                    item.innerHTML = `<div><b>${id.toUpperCase()}</b> - ${name}</div><div>${badge}</div>`;
                     listContainer.appendChild(item);
                 }
             });
 
-            if (filteredCount === 0) {
-                listContainer.innerHTML = `<div class="p-6 text-center text-gray-400">कोई रिकॉर्ड नहीं मिला!</div>`;
-            }
-
-            // खर्चों की लिस्ट दोबारा बनाना
             const expContainer = document.getElementById('expenses-list');
             expContainer.innerHTML = '';
-
-            if (!yearData.expenses || yearData.expenses.length === 0) {
-                expContainer.innerHTML = `<div class="p-6 text-center text-gray-400 text-sm">इस वर्ष कोई खर्च दर्ज नहीं है।</div>`;
-                return;
+            if(yearData.expenses && yearData.expenses.length > 0) {
+                yearData.expenses.forEach((exp, idx) => {
+                    const item = document.createElement('div');
+                    item.className = "p-3 flex justify-between text-sm border-b border-gray-100";
+                    item.innerHTML = `<div><button onclick="deleteExpense(${idx})" class='text-red-500 mr-2'>🗑</button>${exp.title}</div><div class='text-red-600 font-bold'>₹${exp.amount}</div>`;
+                    expContainer.appendChild(item);
+                });
+            } else {
+                expContainer.innerHTML = `<div class="p-4 text-center text-gray-400 text-xs">कोई खर्च दर्ज नहीं है</div>`;
             }
-
-            const reversedExpenses = [...yearData.expenses].reverse();
-            reversedExpenses.forEach((exp, index) => {
-                const actualIndex = yearData.expenses.length - 1 - index; 
-                const item = document.createElement('div');
-                item.className = "p-3 flex justify-between items-center hover:bg-red-50 transition text-sm";
-                item.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <button onclick="deleteExpense(${actualIndex})" class="text-red-400 hover:text-red-600 mr-1 cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        <span class="text-gray-700 font-medium">${exp.title}</span>
-                    </div>
-                    <span class="text-red-600 font-bold">₹${parseInt(exp.amount).toLocaleString('en-IN')}</span>
-                `;
-                expContainer.appendChild(item);
-            });
         }
 
-        // चंदा जमा करना
-        function markAsPaid(id) {
-            const pass = prompt(`${currentYear} के लिए पैसे जमा करने का पासवर्ड डालें:`);
+        async function markAsPaid(id) {
+            const pass = prompt("पासवर्ड डालें:");
             if (pass === ADMIN_PASSWORD) {
-                const customAmount = prompt(`ID ${id.toUpperCase()} (${mandalData.memberNames[id]}) ने कितने रुपये दिए?`, "500");
-                if (customAmount && !isNaN(customAmount) && parseInt(customAmount) > 0) {
-                    mandalData.years[currentYear].collections[id] = {
-                        status: 'paid',
-                        amount: parseInt(customAmount)
-                    };
+                const amt = prompt("रकम दर्ज करें:", "500");
+                if (amt && !isNaN(amt)) {
+                    mandalData.years[currentYear].collections[id] = { status: 'paid', amount: parseInt(amt) };
                     refreshAll();
-                } else if (customAmount !== null) {
-                    alert("कृपया सही संख्या डालें!");
+                    await saveDataToGitHub(); 
                 }
             } else if (pass !== null) alert("गलत पासवर्ड!");
         }
 
-        // नया खर्च जोड़ना
-        function addExpense() {
-            const pass = prompt(`${currentYear} में नया खर्च जोड़ने का पासवर्ड डालें:`);
+        async function addExpense() {
+            const pass = prompt("पासवर्ड डालें:");
             if (pass === ADMIN_PASSWORD) {
-                const title = prompt("खर्च का विवरण (जैसे: प्रसाद, जनरेटर, टेंट):");
-                if (!title || title.trim() === "") return;
-
-                const amount = prompt(`"${title}" में कितने रुपये खर्च हुए? (सिर्फ संख्या):`);
-                if (amount && !isNaN(amount) && parseInt(amount) > 0) {
-                    mandalData.years[currentYear].expenses.push({
-                        title: title.trim(),
-                        amount: parseInt(amount)
-                    });
+                const title = prompt("खर्च का नाम:");
+                const amt = prompt("रकम:");
+                if (title && amt && !isNaN(amt)) {
+                    mandalData.years[currentYear].expenses.push({ title, amount: parseInt(amt) });
                     refreshAll();
-                } else if (amount !== null) {
-                    alert("कृपया सही रकम डालें!");
+                    await saveDataToGitHub(); 
                 }
             } else if (pass !== null) alert("गलत पासवर्ड!");
         }
 
-        // खर्च हटाना
-        function deleteExpense(index) {
-            const pass = prompt("खर्च हटाने के लिए पासवर्ड डालें:");
-            if (pass === ADMIN_PASSWORD) {
-                if (confirm(`क्या आप सचमुच यह खर्च हटाना चाहते हैं?`)) {
-                    mandalData.years[currentYear].expenses.splice(index, 1);
-                    refreshAll();
-                }
-            } else if (pass !== null) alert("गलत पासवर्ड!");
-        }
-
-        // नया सदस्य जोड़ना
-        function addNewMember() {
-            const pass = prompt("नया सदस्य जोड़ने के लिए एडमिन पासवर्ड डालें:");
-            if (pass === ADMIN_PASSWORD) {
-                const newName = prompt("नए सदस्य का नाम लिखें:");
-                if (newName && newName.trim() !== "") {
-                    const nextIdNum = Object.keys(mandalData.memberNames).length + 1;
-                    const newId = `m${nextIdNum}`;
-                    mandalData.memberNames[newId] = newName.trim();
-                    refreshAll();
-                    alert(`सफलतापूर्वक सदस्य जोड़ा गया! ID: ${newId.toUpperCase()}`);
-                }
-            } else if (pass !== null) alert("गलत पासवर्ड!");
-        }
-
-        // नाम सुधारना
-        function editMemberName() {
-            const pass = prompt("नाम सुधारने के लिए एडमिन पासवर्ड डालें:");
-            if (pass !== ADMIN_PASSWORD) {
-                if(pass !== null) alert("गलत पासवर्ड!");
-                return;
-            }
-            const memberId = prompt("जिस सदस्य का नाम बदलना है उसका ID नंबर लिखें (जैसे: m1, m5):").toLowerCase();
-            if (!memberId || !mandalData.memberNames[memberId]) {
-                alert("गलत ID!");
-                return;
-            }
-            const newName = prompt(`ID ${memberId.toUpperCase()} का नया नाम लिखें:`);
-            if (newName && newName.trim() !== "") {
-                mandalData.memberNames[memberId] = newName.trim();
+        async function deleteExpense(idx) {
+            if (prompt("पासवर्ड:") === ADMIN_PASSWORD) {
+                mandalData.years[currentYear].expenses.splice(idx, 1);
                 refreshAll();
-                alert("नाम सुधर गया है!");
-            }
+                await saveDataToGitHub();
+            } else { alert("गलत पासवर्ड!"); }
         }
 
-        // बैकअप डाउनलोड
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mandalData));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `shri_pragati_ganesh_master_backup.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        // बैकअप अपलोड
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (importedData.memberNames && importedData.years) {
-                        mandalData = importedData;
-                        refreshAll();
-                        alert("मास्टर डेटा सफलतापूर्वक लोड हो गया है!");
-                    } else {
-                        alert("गलत बैकअप फाइल!");
-                    }
-                } catch (err) {
-                    alert("फाइल पढ़ने में दिक्कत हुई!");
+        async function addNewMember() {
+            if (prompt("पासवर्ड:") === ADMIN_PASSWORD) {
+                const name = prompt("नए सदस्य का नाम:");
+                if (name) {
+                    const nextId = `m${Object.keys(mandalData.memberNames).length + 1}`;
+                    mandalData.memberNames[nextId] = name;
+                    refreshAll();
+                    await saveDataToGitHub();
                 }
-            };
-            reader.readAsText(file);
+            } else { alert("गलत पासवर्ड!"); }
         }
 
-        // सर्च फ़िल्टर
-        function filterMembers(type) {
-            currentFilter = type;
-            ['all', 'paid', 'pending'].forEach(t => {
-                const btn = document.getElementById(`btn-${t}`);
-                btn.className = (t === type) ? "px-4 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white shadow-sm whitespace-nowrap" : "px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 whitespace-nowrap";
-            });
-            refreshAll();
-        }
+        function forceSync() { saveDataToGitHub(); }
+        function filterMembers(type) { currentFilter = type; refreshAll(); }
+        document.getElementById('search-input').addEventListener('input', (e) => { searchQuery = e.target.value; refreshAll(); });
 
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            refreshAll();
-        });
-
-        // बिना किसी लोड के तुरंत पहली बार रन करने के लिए सीधे कॉल करना
-        refreshAll();
+        loadDataFromGitHub();
     </script>
 </body>
 </html>
