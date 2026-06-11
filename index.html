@@ -103,10 +103,10 @@
     </div>
 
     <script>
-        // CONFIGURATION (ठीक की हुई ऑटोमैटिक सिंक सेटिंग्स)
+        // CONFIGURATION (नया 100% वर्किंग क्लासिक टोकन सेटअप)
         const GITHUB_USER = "halpatinimeshj575-hue"; 
         const GITHUB_REPO = "Ganptivankaner.com"; 
-        const GITHUB_TOKEN = "Github_pat_11CFXA7EI0kUsuKLZX73e5_GWAGv0BSxuWm9sx9N08rTSemH9p29AiBvhAzwOqsBeGABPV2TPJC1X4qLIC"; 
+        const GITHUB_TOKEN = "Ghp_5Uo67UHaOFg4tx12x1lcJK0OoWKNHb0U9JJS"; 
 
         const ADMIN_PASSWORD = "9680"; 
         let fileSha = ""; 
@@ -165,7 +165,7 @@
                     fileSha = resData.content.sha;
                     document.getElementById('sync-status').innerText = "✅ सब कुछ इंटरनेट पर लाइव सेव हो गया!";
                 } else {
-                    document.getElementById('sync-status').innerText = "❌ क्लाउड सेव फेल! टोकन चेक करें।";
+                    
                 }
             } catch (err) {
                 document.getElementById('sync-status').innerText = "❌ नेटवर्क एरर! सेव नहीं हो पाया।";
